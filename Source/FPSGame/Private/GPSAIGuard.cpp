@@ -12,6 +12,7 @@ AGPSAIGuard::AGPSAIGuard()
 	PrimaryActorTick.bCanEverTick = true;
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComp"));
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &AGPSAIGuard::OnPawnSeen);
+	PawnSensingComp->OnHearNoise.AddDynamic(this, &AGPSAIGuard::OnNoiseHeard);
 }
 
 // Called when the game starts or when spawned
@@ -23,12 +24,17 @@ void AGPSAIGuard::BeginPlay()
 
 void AGPSAIGuard::OnPawnSeen(APawn* SeenPawn)
 {
-	if (!SeenPawn)
+	if (SeenPawn == nullptr)
 	{
 		return;
 	}
 
-	DrawDebugSphere(GetWorld(), SeenPawn->GetActorLocation(), 32.0f, 12, FColor::Green, false, 10.0f);
+	DrawDebugSphere(GetWorld(), SeenPawn->GetActorLocation(), 32.0f, 12, FColor::Red, false, 10.0f);
+}
+
+void AGPSAIGuard::OnNoiseHeard(APawn * NoiseInstigator, const FVector & Location, float Volume)
+{
+	DrawDebugSphere(GetWorld(), Location, 32.0f, 12, FColor::Green, false, 10.0f);
 }
 
 // Called every frame
