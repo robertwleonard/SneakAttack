@@ -4,7 +4,7 @@
 #include "Perception/PawnSensingComponent.h"
 #include "DrawDebugHelpers.h"
 #include "FPSGameMode.h"
-
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -26,12 +26,17 @@ void AGPSAIGuard::BeginPlay()
 	OriginalRotation = GetActorRotation();
 }
 
+void AGPSAIGuard::OnRep_GuardState()
+{
+	OnStateChanged(GuardState);
+}
+
 void AGPSAIGuard::SetGuardState(EAIState NewState)
 {
 	if (GuardState == NewState) { return; }
 
 	GuardState = NewState;
-	OnStateChanged(GuardState);
+	OnRep_GuardState();
 }
 
 void AGPSAIGuard::OnPawnSeen(APawn* SeenPawn)
@@ -93,3 +98,9 @@ void AGPSAIGuard::Tick(float DeltaTime)
 
 }
 
+void AGPSAIGuard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGPSAIGuard, GuardState);
+}
